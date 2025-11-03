@@ -17,11 +17,25 @@ export function createPost(req, res) {
 }
 
 export function getPosts(req, res) {
-  
+   console.log(req.query);
+   const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 4;
+  const offset = (page - 1) * limit;
+
+  const query = `SELECT * FROM posts ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+  db.query(query, [limit, offset], (err, results) => {
+    if (err) {
+      console.error('Error fetching posts:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.status(200).json(results);
+  });
 }
+
+
 export function updatePost(req, res) {
 
-}
+} 
 
 export function deletePost(req, res) {
 
@@ -29,12 +43,12 @@ export function deletePost(req, res) {
 export function createMatchDay(req, res) {
 
     console.log(req.body);
-    const { match_date, event_type, home_team, away_team, home_score, away_score, venue } = req.body;
+    const { match_date, event_type, home_team, away_team, venue } = req.body;
     const match_date_mysql = new Date(match_date).toISOString().slice(0, 19).replace('T', ' ');
 
     db.query(
-      'INSERT INTO matchdays (match_date, event_type, home_team, away_team, home_score, away_score, venue) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [match_date_mysql, event_type, home_team, away_team, home_score, away_score, venue],
+      'INSERT INTO matchdays (match_date, event_type, home_team, away_team, venue) VALUES (?, ?, ?, ?, ?)',
+      [match_date_mysql, event_type, home_team, away_team, venue],
       (err, results) => {
         if (err) {
           console.error('Error inserting match day:', err);
@@ -46,7 +60,8 @@ export function createMatchDay(req, res) {
 } 
 
 export function getMatchDays(req, res) {
-   db.query('SELECT * FROM matchdays WHERE match_date > CURRENT_TIMESTAMP ', (err, results) => {
+  console.log("Fetching match days");
+   db.query('SELECT * FROM matchdays', (err, results) => {
     if (err) {
       console.error('Error fetching match days:', err);
       return res.status(500).json({ error: 'Database error' });
@@ -54,4 +69,6 @@ export function getMatchDays(req, res) {
     res.status(200).json(results); 
   });
 }
+
+//WHERE match_date > CURRENT_TIMESTAMP LIMIT 10
   

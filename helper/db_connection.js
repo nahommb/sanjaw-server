@@ -1,22 +1,24 @@
 // Example using the 'mysql2' driver
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 
-export const db  = mysql.createConnection({
-  host: '127.0.0.1',
-  user: 'root',
-  password: 'niyana',
-  database: 'sanjaw_db'
-});
+let db;
 
-db.connect(err => {
-  if (err) {
-    console.error('Error connecting: ' + err.stack);
-    return;
-  }
-  console.log('Connected to database as ID ' + db.threadId);
-});
+async function initDB() {
+  db = await mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "niyana",
+    database: "sanjaw_db",
+  });
+  console.log("✅ Database connected");
+}
 
-// create tables if they don't exist
+initDB();
+
+export { db };
+
+
+// // create tables if they don't exist
 //  const tables = [
 //     // posts table
 //     `
@@ -25,6 +27,7 @@ db.connect(err => {
 //       title VARCHAR(255) NOT NULL,
 //       content TEXT,
 //       image_url VARCHAR(255),
+//       video_url VARCHAR(255),
 //       author VARCHAR(100),
 //       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 //     )
@@ -37,12 +40,20 @@ db.connect(err => {
 //       event_type VARCHAR(100),
 //       home_team VARCHAR(100) NOT NULL,
 //       away_team VARCHAR(100) NOT NULL,
-//       home_score INT DEFAULT 0,
-//       away_score INT DEFAULT 0,
 //       venue VARCHAR(255),
 //       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 //     )
-//     `
+//    `,
+//    `
+//   CREATE TABLE match_events (
+//   id INT AUTO_INCREMENT PRIMARY KEY,
+//   match_id INT NOT NULL,
+//   event_type VARCHAR(100),
+//   team_name VARCHAR(100),
+//   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+// )`
+
+    
 //   ];
 
 //   // 4️⃣ Execute all table creations sequentially
