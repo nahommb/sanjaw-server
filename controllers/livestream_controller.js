@@ -1,47 +1,33 @@
-import { Server } from "socket.io";
-import { db } from "../helper/db_connection.js";
+import express from 'express';
+import { db } from '../helper/db_connection.js';
+import { io } from '../helper/socket_server.js';
 
-const io = new Server({
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+export async function createLiveMatchController (req,res){
+    console.log("LivestreamController called");
+
+    const {home_team,away_team} = req.body;
+    try {
+      const[result] = await db.query("INSERT INTO matches (home_team,away_team) VALUES (?,?)",[home_team,away_team])
+       
+       res.status(201).json({ message: "created", postId: result.insertId });
     }
-});
-
-export async function  LivestreamController(req, res) {
-    const{match_id,event_type,team_name}=req.body;
-    console.log(req.body);
-    try{
-        const [results] = await db.query(
-        'INSERT INTO match_events (match_id, event_type, team_name) VALUES (?, ?, ?)',
-        [match_id, event_type, team_name]
-    );
-
-    io.emit('new_match_event', { match_id, event_type, team_name });
-
-    res.status(201).json({ message: 'Match event created', eventId: results.insertId });
+    catch (err) {
+        console.error("Error in LivestreamController:", err);
+        res.status(500).json({ error: "Internal server error" });
     }
-    catch(err){
-        console.error('Error inserting match event:', err);
-        return res.status(500).json({ error: 'Database error' });
+ 
+}
+
+export async function getLiveMatchController (req,res){
+    console.log("getLiveMatchController called");
+    try {
+       const [rows] = await db.query(
+         "SELECT * FROM matches",
+       );
+       res.status(200).json(rows);
     }
-
-    io.on('connection', (socket) => {
-        console.log('a user connected:', socket.id);
-        
-        io.on('get_live_events', () => {
-            // Fetch live events from the database and emit to the client
-            db.query('SELECT * FROM match_events ORDER BY created_at DESC', (err, results) => {
-                if (err) {
-                    console.error('Error fetching live events:', err);
-                    return;
-                }
-                socket.emit('live_events', results); 
-            });
-        });
-
-        socket.on('disconnect', () => {
-            console.log('user disconnected:', socket.id);
-        });
-    });
-} 
+    catch (err) {
+        console.error("Error in getLiveMatchController:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}

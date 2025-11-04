@@ -1,36 +1,37 @@
 import { db } from "../helper/db_connection.js";
 
 
-export function createPost(req, res) {
-   db.query(
-    'INSERT INTO posts (title, content, image_url, author) VALUES (?, ?, ?, ?)',
-    [req.body.title, req.body.content, req.body.image_url, req.body.author],
-    (err, results) => {
-      if (err) {
-        console.error('Error inserting post:', err);
-        return res.status(500).json({ error: 'Database error' });
-      }
-      res.status(201).json({ message: 'Post created', postId: results.insertId });
-    }
-  );
-   
+export async function createPost(req, res) {
+  try {
+    const { title, content, image_url, author } = req.body;
+    const [result] = await db.query(
+      "INSERT INTO posts (title, content, image_url, author) VALUES (?, ?, ?, ?)",
+      [title, content, image_url, author]
+    );
+    res.status(201).json({ message: "Post created", postId: result.insertId });
+  } catch (err) {
+    console.error("Error inserting post:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 }
 
-export function getPosts(req, res) {
-   console.log(req.query);
-   const page = parseInt(req.query.page) || 1;
+export async function getPosts(req, res) {
+  const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 4;
   const offset = (page - 1) * limit;
 
-  const query = `SELECT * FROM posts ORDER BY created_at DESC LIMIT ? OFFSET ?`;
-  db.query(query, [limit, offset], (err, results) => {
-    if (err) {
-      console.error('Error fetching posts:', err);
-      return res.status(500).json({ error: 'Database error' });
-    }
+  try {
+    const [results] = await db.query(
+      "SELECT * FROM posts ORDER BY created_at DESC LIMIT ? OFFSET ?",
+      [limit, offset]
+    );
     res.status(200).json(results);
-  });
+  } catch (err) {
+    console.error("Error fetching posts:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 }
+
 
 
 export function updatePost(req, res) {
@@ -40,35 +41,48 @@ export function updatePost(req, res) {
 export function deletePost(req, res) {
 
 }
-export function createMatchDay(req, res) {
 
-    console.log(req.body);
+export async function createMatchDay(req, res) {
+  console.log(req.body);
+
+  try {
     const { match_date, event_type, home_team, away_team, venue } = req.body;
-    const match_date_mysql = new Date(match_date).toISOString().slice(0, 19).replace('T', ' ');
 
-    db.query(
-      'INSERT INTO matchdays (match_date, event_type, home_team, away_team, venue) VALUES (?, ?, ?, ?, ?)',
-      [match_date_mysql, event_type, home_team, away_team, venue],
-      (err, results) => {
-        if (err) {
-          console.error('Error inserting match day:', err);
-          return res.status(500).json({ error: 'Database error' });
-        }
-        res.status(201).json({ message: 'Match day created', matchDayId: results.insertId });
-      }
+    // Convert JS date to MySQL DATETIME format
+    const match_date_mysql = new Date(match_date)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
+    // Execute insert query
+    const [result] = await db.query(
+      "INSERT INTO matchdays (match_date, event_type, home_team, away_team, venue) VALUES (?, ?, ?, ?, ?)",
+      [match_date_mysql, event_type, home_team, away_team, venue]
     );
-} 
 
-export function getMatchDays(req, res) {
-  console.log("Fetching match days");
-   db.query('SELECT * FROM matchdays', (err, results) => {
-    if (err) {
-      console.error('Error fetching match days:', err);
-      return res.status(500).json({ error: 'Database error' });
-    }
-    res.status(200).json(results); 
-  });
+    res
+      .status(201)
+      .json({ message: "Match day created", matchDayId: result.insertId });
+  } catch (err) {
+    console.error("Error inserting match day:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 }
+
+
+export async function getMatchDays(req, res) {
+  console.log("Fetching match days");
+  try {
+    const [results] = await db.query(
+      "SELECT * FROM matchdays WHERE match_date > CURRENT_TIMESTAMP ORDER BY match_date ASC LIMIT 10"
+    );
+    res.status(200).json(results);
+  } catch (err) {
+    console.error("Error fetching match days:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+}
+
 
 //WHERE match_date > CURRENT_TIMESTAMP LIMIT 10
   

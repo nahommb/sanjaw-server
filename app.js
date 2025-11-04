@@ -7,7 +7,9 @@ import post_routes from './routes/post_routes.js';
 import livestream_routes from './routes/livestream_routes.js';
 import {db} from './helper/db_connection.js';
 import cors from "cors";
+import http from 'http';
 import { Server } from "socket.io";
+import { initSocket } from './helper/socket_server.js';
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -15,31 +17,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/posts/',post_routes)
 app.use('/api/livestream',livestream_routes)
 
-// const io = new Server({
-//     cors: {
-//         origin: "*",
-//         methods: ["GET", "POST"]
-//     }
-// });
 
-// io.on("connection", (socket) => {
-//   console.log("User connected:", socket.id);
+// Setup Socket.IO
+ 
 
-//   socket.on("get_live_events", async () => {
-//     try {
-//       const [results] = await db.query(
-//         "SELECT * FROM match_events ORDER BY created_at DESC"
-//       );
-//       socket.emit("live_events", results);
-//     } catch (err) {
-//       console.error("Error fetching live events:", err);
-//     }
-//   });
+const server = http.createServer(app);
+initSocket(server);
 
-//   socket.on("disconnect", () => {
-//     console.log("User disconnected:", socket.id);
-//   });
-// });
 
 app.use(cors(
   {
@@ -55,6 +39,6 @@ app.get('/', (req, res) => {
 }); 
 
 // Start the server
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 }); 
