@@ -31,3 +31,28 @@ export async function getLiveMatchController (req,res){
         res.status(500).json({ error: "Internal server error" });
     }
 }
+
+// POST /api/livestream/send-event
+export async function sendLiveEventController(req, res) {
+  const { match_id, event_type, team_name ,team_type} = req.body;
+
+  if (!match_id || !event_type || !team_name || !team_type) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  try {
+    // Insert into DB
+    await db.query(
+      "INSERT INTO match_events (match_id, event_type, team_name, team_type) VALUES (?, ?, ?, ?)",
+      [match_id, event_type, team_name,team_type]
+    );
+
+    // Emit to all clients in the match room
+    io.to(match_id).emit('new_live_event', { match_id, event_type, team_name,team_type });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

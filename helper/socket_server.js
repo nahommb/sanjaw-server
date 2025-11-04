@@ -23,11 +23,13 @@ export function initSocket(server) {
 
     // Fetch live events for a match
     socket.on("get_live_events", async (matchId) => {
+      console.log(matchId);
       try {
         const [rows] = await db.query(
           "SELECT * FROM match_events WHERE match_id = ? ORDER BY created_at DESC",
           [matchId]
         );
+        console.log(rows)
         socket.emit("live_events", rows);
       } catch (err) {
         console.error("Error fetching live events:", err);
@@ -36,13 +38,13 @@ export function initSocket(server) {
 
     // Send new event to a specific match room
     socket.on("send_live_event", async (eventData) => {
-      const { match_id, event_type, team_name } = eventData;
+      const { match_id, event_type, team_name, team_type} = eventData;
 
       try {
         // Insert into DB
         await db.query(
-          "INSERT INTO match_events (match_id, event_type, team_name) VALUES (?, ?, ?)",
-          [match_id, event_type, team_name]
+          "INSERT INTO match_events (match_id, event_type, team_name,team_type) VALUES (?, ?, ?, ?)",
+          [match_id, event_type, team_name,team_type]
         );
 
         // Fetch latest event to send
