@@ -16,11 +16,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/posts/',post_routes)
 app.use('/api/livestream',livestream_routes)
-
+ 
 
 // Setup Socket.IO
  
-
+ 
 const server = http.createServer(app);
 initSocket(server);
 
@@ -32,13 +32,13 @@ app.use(cors(
     allowedHeaders: ['Content-Type','Authorization']
   }
 ));
- // Initialize DB connection
+ // Initialize DB connection  
 // Sample route
 app.get('/', (req, res) => {
   res.send('Hello World!');
-}); 
+});  
 
 // Start the server
 server.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
-}); 
+});      
