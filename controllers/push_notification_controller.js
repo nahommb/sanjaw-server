@@ -2,10 +2,11 @@ import admin from "../helper/firebase.js";
 
 export async function pushNotification(req,res){
     const {title,body} = req.body;
-    const token = 'fkY3SC9nSqCWZD2phNOcYQ:APA91bHrJg2jzSI8nm3zfxv7isEMO4iHxHvx1lSY3-7Ci4DUZGbzYsQBTeFX6ZuSoJs3cG56WbnSTGJPWGT6lRf7NPtguOjom982UR0RdaW5VPHWTCH033A';
+    
     const message = {
     notification: { title, body },
-    token, // device FCM token
+    topic:'live_updates'
+    // token, // device FCM token
   };
 
   try {
