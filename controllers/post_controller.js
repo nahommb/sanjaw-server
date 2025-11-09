@@ -3,12 +3,22 @@ import { db } from "../helper/db_connection.js";
 
 export async function createPost(req, res) {
   try {
-    const { title, content, image_url, author } = req.body;
+    const { title, content, author } = req.body;
+
+    // Extract file URLs from Cloudinary
+    const mediaUrls = req.files.map((file) => file.path);
+
+    // Save to DB (store mediaUrls as JSON string)
     const [result] = await db.query(
-      "INSERT INTO posts (title, content, image_url, author) VALUES (?, ?, ?, ?)",
-      [title, content, image_url, author]
+      "INSERT INTO posts (title, content, author, media_urls) VALUES (?, ?, ?, ?)",
+      [title, content, author, JSON.stringify(mediaUrls)]
     );
-    res.status(201).json({ message: "Post created", postId: result.insertId });
+
+    res.status(201).json({
+      message: "Post created successfully",
+      postId: result.insertId,
+      media: mediaUrls,
+    });
   } catch (err) {
     console.error("Error inserting post:", err);
     res.status(500).json({ error: "Database error" });

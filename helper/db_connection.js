@@ -21,6 +21,7 @@ async function initDB() {
 //       image_url VARCHAR(255),
 //       video_url VARCHAR(255),
 //       author VARCHAR(100),
+//       media_urls JSON,
 //       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 //     )
 //     `,
@@ -41,6 +42,7 @@ async function initDB() {
 //       match_id INT NOT NULL,
 //       event_type VARCHAR(100),
 //       team_name VARCHAR(100),
+//       team_type VARCHAR(100),
 //       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 //     )
 //     `,
@@ -48,7 +50,8 @@ async function initDB() {
 //     CREATE TABLE IF NOT EXISTS matches (
 //       id INT AUTO_INCREMENT PRIMARY KEY,
 //       home_team VARCHAR(100) NOT NULL,
-//       away_team VARCHAR(100) NOT NULL
+//       away_team VARCHAR(100) NOT NULL,
+//       live_id VARCHAR(100) NOT NULL,
 //     )
 //     `
 //   ];
