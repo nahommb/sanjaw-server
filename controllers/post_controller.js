@@ -84,7 +84,7 @@ export async function getMatchDays(req, res) {
   console.log("Fetching match days");
   try {
     const [results] = await db.query(
-      "SELECT * FROM matchdays WHERE match_date > CURRENT_TIMESTAMP ORDER BY match_date ASC LIMIT 10"
+      "SELECT * FROM matchdays ORDER BY match_date ASC LIMIT 10"
     );
     res.status(200).json(results);
   } catch (err) {
