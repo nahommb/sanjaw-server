@@ -1,4 +1,4 @@
-import { db } from "../helper/db_connection";
+import { db } from "../helper/db_connection.js";
 
 export async function createStory(req,res){
   

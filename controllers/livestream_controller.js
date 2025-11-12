@@ -2,12 +2,13 @@ import express from 'express';
 import { db } from '../helper/db_connection.js';
 import { io } from '../helper/socket_server.js';
 
+
 export async function createLiveMatchController (req,res){
     console.log("LivestreamController called");
 
-    const {home_team,away_team} = req.body;
+    const {home_team,away_team,live_id} = req.body;
     try {
-      const[result] = await db.query("INSERT INTO matches (home_team,away_team) VALUES (?,?)",[home_team,away_team])
+      const[result] = await db.query("INSERT INTO matches (home_team,away_team,live_id) VALUES (?,?,?)",[home_team,away_team,live_id])
        
        res.status(201).json({ message: "created", postId: result.insertId });
     }
@@ -56,3 +57,18 @@ export async function sendLiveEventController(req, res) {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+export async function editLiveScoreController(req,res){
+  const {home_score,away_score,match_id} = req.body;
+
+  try{
+   await db.query("UPDATE mathe_events SET (home_score,away_score) VALUES (?, ?)",[home_score,away_score])
+   io.to(match_id).emit('new_live_event',{home_score,away_score});
+
+   res.json({success:true})
+  }
+  catch(err){
+    console.log(err)
+    res.status(500).json({error:err})
+  }
+}
