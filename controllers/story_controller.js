@@ -9,12 +9,24 @@ export async function createStory(req,res){
     const {title,content} = req.body;
 
     const [result] = await db.query(
-        "INSER INTO storys (title,content,media_urls) VALUES (?, ?, ?)",[title,content,JSON.stringify(media_urls)]
+        "INSERT INTO stories (title,content,media_urls) VALUES (?, ?, ?)",[title,content,JSON.stringify(media_urls)]
     );
     res.status(200).json({message:'Story created',story:result})
     }
     catch(err){
+      console.log(err)
       res.status(500).json({error:err.message})
     }
    
+}
+
+export async function getStoryController(req,res){
+  try{
+    const [result] = await db.query("SELECT * FROM stories")
+
+    res.status(200).json(result)
+  }
+  catch(err){
+    res.status(500).json({error:err.message})
+  }
 }

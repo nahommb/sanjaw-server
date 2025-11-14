@@ -25,6 +25,15 @@ async function initDB() {
 //       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 //     )
 //     `,
+//    `
+//      CREATE TABLE IF NOT EXISTS stories (
+//       id INT AUTO_INCREMENT PRIMARY KEY,
+//       title VARCHAR(255) NOT NULL,
+//       content TEXT,
+//       media_urls JSON,
+//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+//     )
+//    `,
 //     `
 //     CREATE TABLE IF NOT EXISTS matchdays (
 //       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -43,6 +52,8 @@ async function initDB() {
 //       event_type VARCHAR(100),
 //       team_name VARCHAR(100),
 //       team_type VARCHAR(100),
+//       home_score INT DEFAULT 0,
+//       away_score INT DEFAULT 0,
 //       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 //     )
 //     `,

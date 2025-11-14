@@ -59,10 +59,13 @@ export async function sendLiveEventController(req, res) {
 };
 
 export async function editLiveScoreController(req,res){
-  const {home_score,away_score,match_id} = req.body;
+  const {id,home_score,away_score,match_id} = req.body;
 
   try{
-   await db.query("UPDATE mathe_events SET (home_score,away_score) VALUES (?, ?)",[home_score,away_score])
+  await db.query(
+  "UPDATE matche_events SET home_score = ?, away_score = ? WHERE id = ?",
+  [home_score, away_score, id]
+    );
    io.to(match_id).emit('new_live_event',{home_score,away_score});
 
    res.json({success:true})

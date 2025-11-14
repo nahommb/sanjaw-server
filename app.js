@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/posts/',post_routes)
 app.use('/api/livestream',livestream_routes)
-app.use('/story',story_routes)
+app.use('/api/stories',story_routes)
 
 // Setup Socket.IO
  
