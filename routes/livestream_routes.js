@@ -9,4 +9,4 @@ router.post("/createlivematch", createLiveMatchController);
 router.post('/sendevent',sendLiveEventController)
 router.post('/notifiy',pushNotification)
 
-export default router;
+export default router; 

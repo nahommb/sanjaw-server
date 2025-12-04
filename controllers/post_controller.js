@@ -1,5 +1,5 @@
 import { db } from "../helper/db_connection.js";
-
+import { v2 as cloudinary } from "cloudinary";
 
 export async function createPost(req, res) {
   try {
@@ -8,6 +8,7 @@ export async function createPost(req, res) {
     // Extract file URLs from Cloudinary
     const mediaUrls = req.files.map((file) => file.path);
 
+    console.log(mediaUrls);
     // Save to DB (store mediaUrls as JSON string)
     const [result] = await db.query(
       "INSERT INTO posts (title, content, author, media_urls) VALUES (?, ?, ?, ?)",
@@ -16,19 +17,19 @@ export async function createPost(req, res) {
 
     res.status(201).json({
       message: "Post created successfully",
-      postId: result.insertId,
+      postId: result.insertId, 
       media: mediaUrls,
     });
   } catch (err) {
     console.error("Error inserting post:", err);
     res.status(500).json({ error: "Database error" });
   }
-}
+} 
 
 export async function getPosts(req, res) {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 4;
-  const offset = (page - 1) * limit;
+  const offset = (page - 1) * limit; 
 
   try {
     const [results] = await db.query(
@@ -48,8 +49,46 @@ export function updatePost(req, res) {
 
 } 
 
-export function deletePost(req, res) {
+export async function deletePost(req, res) {
+  
+  const { id } = req.params;
 
+  try {
+ 
+    const [rows] = await db.query("SELECT media_urls FROM posts WHERE id = ?", [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const media = JSON.parse(rows[0].media_urls); 
+
+  
+    for (let url of media) {
+
+      const parts = url.split("/");
+      const resourceType = parts[parts.indexOf("upload") - 1];  
+    
+      const fileName = parts[parts.length - 1]; 
+      const publicId = fileName.split(".")[0];   
+
+      console.log("Deleting:", publicId, "Type:", resourceType);
+
+   
+      await cloudinary.uploader.destroy(publicId, {
+        resource_type: resourceType
+      });
+    }
+
+  
+    const [result] = await db.query("DELETE FROM posts WHERE id = ?", [id]);
+
+    res.status(200).json({ message: "Post deleted successfully" });
+
+  } catch (err) {
+    console.error("Error deleting post:", err);
+    res.status(500).json({ error: "Server Error" });
+  }
 }
 
 export async function createMatchDay(req, res) {
@@ -58,13 +97,13 @@ export async function createMatchDay(req, res) {
   try {
     const { match_date, event_type, home_team, away_team, venue } = req.body;
 
-    // Convert JS date to MySQL DATETIME format
+    
     const match_date_mysql = new Date(match_date)
       .toISOString()
       .slice(0, 19)
       .replace("T", " ");
 
-    // Execute insert query
+   
     const [result] = await db.query(
       "INSERT INTO matchdays (match_date, event_type, home_team, away_team, venue) VALUES (?, ?, ?, ?, ?)",
       [match_date_mysql, event_type, home_team, away_team, venue]
