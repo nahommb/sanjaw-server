@@ -8,7 +8,7 @@ export async function createPost(req, res) {
     // Extract file URLs from Cloudinary
     const mediaUrls = req.files.map((file) => file.path);
 
-    console.log(mediaUrls);
+    // console.log(mediaUrls);
     // Save to DB (store mediaUrls as JSON string)
     const [result] = await db.query(
       "INSERT INTO posts (title, content, author, media_urls) VALUES (?, ?, ?, ?)",
@@ -45,14 +45,26 @@ export async function getPosts(req, res) {
 
 
 
-export function updatePost(req, res) {
+export async function updatePost(req, res) {
 
+  const {content} = req.body;
+  const {id} = req.params;
+ 
+  try{
+   const [row] = await db.query("UPDATE posts SET content = ? WHERE id = ?",[content,id])
+   if(row.affectedRows === 0){
+    return res.status(404).json({message:'Post not found'})
+   }
+   res.status(200).json({message:'updated successfuly'})
+  }
+  catch(err){
+    res.status(500).json({message:'Internal server error'})
+  }
 } 
 
 export async function deletePost(req, res) {
   
   const { id } = req.params;
-
   try {
  
     const [rows] = await db.query("SELECT media_urls FROM posts WHERE id = ?", [id]);
