@@ -106,7 +106,7 @@ export function validetToken(req, res){
   // Verify token (using JWT)
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    res.status(200).json({ user: { email: decoded.email } });
+    res.status(200).json({ user: { email: decoded.email,id:decoded.id } });
   } catch {
     res.status(401).json({ message: "Invalid token" });
   }
@@ -133,6 +133,33 @@ export async function deleteAdmin(req, res) {
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
+  }
+}
+
+export async function changePassword(res,req){
+
+  try{
+    const {id} = req.params;
+    const {oldPassword,newPassword} = req.body;
+
+    const [result] = await db.query("SELECT FROM admins WHERE id = ?",[id]);
+    if(result.length == 0){
+      return res.status(404).json({message:'Admin not found'})
+    }
+    else{
+      if(result[0].password == oldPassword){
+       const [row] = await db.query('UPDATE admins WHERE id = ? password = ?',[id,newPassword]);
+       if(row.affectedRows == 0){
+        return res.status(500).json({ message: "Server error" });
+       }
+        res.status(200).json({message:'successfuly changed'})
+      }
+      res.status(403).json({message:'Unauthorized'})
+    }
+    
+  }
+  catch(err){
+  return res.status(500).json({ message: "Server error" });
   }
 }
 
