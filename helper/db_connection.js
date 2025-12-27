@@ -4,9 +4,9 @@ let db;
 
 async function initDB() {
   db = await mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "niyana",
+    host: "nahommb.com",
+    user: "nahommbc",
+    password: "Nahommelese11$",
     database: "sanjaw_db",
   });
   console.log("✅ Database connected");
@@ -22,7 +22,7 @@ async function initDB() {
 //       video_url VARCHAR(255),
 //       author VARCHAR(100),
 //       media_urls JSON,
-//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+//       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
 //     )
 //     `,
 //    `CREATE TABLE IF NOT EXISTS admins (

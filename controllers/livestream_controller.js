@@ -37,8 +37,12 @@ export async function getLiveMatchController (req,res){
 export async function sendLiveEventController(req, res) {
   const { match_id, event_type, team_name ,team_type} = req.body;
 
+  console.log(req.body);
+
   if (!match_id || !event_type || !team_name || !team_type) {
+  
     return res.status(400).json({ error: 'Missing required fields' });
+
   }
 
   try {
@@ -50,20 +54,20 @@ export async function sendLiveEventController(req, res) {
 
     // Emit to all clients in the match room
     io.to(match_id).emit('new_live_event', { match_id, event_type, team_name,team_type });
-
+     
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.status(500).json({ error: 'Server error' });
   }
 };
 
 export async function editLiveScoreController(req,res){
   const {id,home_score,away_score,match_id} = req.body;
-
+  console.log(req.body);
   try{
   await db.query(
-  "UPDATE matche_events SET home_score = ?, away_score = ? WHERE id = ?",
+  "UPDATE match_events SET home_score = ?, away_score = ? WHERE id = ?",
   [home_score, away_score, id]
     );
    io.to(match_id).emit('new_live_event',{home_score,away_score});

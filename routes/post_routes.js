@@ -14,3 +14,6 @@ router.delete('/deletepost/:id',deletePost);
 router.patch('/editpost/:id',updatePost)
 
 export default router; 
+
+
+//https://sanjaw.nahommb.com/posts/allposts
