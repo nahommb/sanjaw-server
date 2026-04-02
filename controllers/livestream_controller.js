@@ -35,47 +35,52 @@ export async function getLiveMatchController (req,res){
 
 // POST /api/livestream/send-event
 export async function sendLiveEventController(req, res) {
-  const { match_id, event_type, team_name ,team_type} = req.body;
+  const { match_id, event_type, team_name ,team_type,home_score,away_score} = req.body;
+ 
+ console.log(req.body);
 
-  console.log(req.body);
 
-  if (!match_id || !event_type || !team_name || !team_type) {
+  if (!match_id || !event_type || !team_type) {
   
     return res.status(400).json({ error: 'Missing required fields' });
 
   }
 
   try {
+ 
     // Insert into DB
     await db.query(
-      "INSERT INTO match_events (match_id, event_type, team_name, team_type) VALUES (?, ?, ?, ?)",
-      [match_id, event_type, team_name,team_type]
+      "INSERT INTO match_events (match_id, event_type, team_name, team_type, home_score, away_score) VALUES (?, ?, ?, ?, ?, ?)",
+      [match_id, event_type, team_name,team_type,home_score,away_score]
     );
 
+    
+    console.log(io.sockets.adapter.rooms);
+
     // Emit to all clients in the match room
-    io.to(match_id).emit('new_live_event', { match_id, event_type, team_name,team_type });
+     io.to(match_id.toString()).emit('new_live_event', { match_id, event_type, team_name,team_type,home_score,away_score });
      
     res.json({ success: true });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Server error' });
   }
-};
+}; 
 
 export async function editLiveScoreController(req,res){
   const {id,home_score,away_score,match_id} = req.body;
   console.log(req.body);
   try{
   await db.query(
-  "UPDATE match_events SET home_score = ?, away_score = ? WHERE id = ?",
-  [home_score, away_score, id]
+  "UPDATE match_events SET home_score = ?, away_score = ? WHERE match_id = ?",
+  [home_score, away_score, match_id]
     );
-   io.to(match_id).emit('new_live_event',{home_score,away_score});
+   io.to(match_id).emit('new_live_event',{home_score,away_score,match_id});
 
    res.json({success:true})
   }
   catch(err){
     console.log(err)
-    res.status(500).json({error:err})
+    res.status(500).json({error:err}) 
   }
 }

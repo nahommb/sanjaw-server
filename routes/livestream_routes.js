@@ -8,6 +8,6 @@ router.get("/getlivematch", getLiveMatchController);
 router.post("/createlivematch", createLiveMatchController);
 router.post('/updatescore',editLiveScoreController)
 router.post('/sendevent',sendLiveEventController)
-router.post('/notifiy',pushNotification)
+router.post('/notify',pushNotification)
 
 export default router; 

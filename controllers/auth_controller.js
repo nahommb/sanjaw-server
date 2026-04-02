@@ -7,10 +7,10 @@ import jwt from "jsonwebtoken";
 
 export async function  createAdmin(req,res){
 
-    // const testEmail = 'nahomjr17@gmail.com';
-    // const testRole = 'admin';
+    const testEmail = 'nahomjr17@gmail.com';
+    const testRole = 'admin';
 
-    const {email,role} = req.body;
+    const {email,role,password} = req.body;
     
    try{
      const [row] = await db.query("SELECT * FROM admins WHERE email = ?",[email]);
@@ -19,13 +19,13 @@ export async function  createAdmin(req,res){
        return res.status(400).json({message:'Admin Already Exist in this Email'})
      }
      // generate password 
-     const password = generatore.generate({
-        length: 8,
-        numbers: true,
-        symbols: true,
-        uppercase: true,
-        lowercase: true,
-     });
+    //  const password = generatore.generate({
+    //     length: 8,
+    //     numbers: true,
+    //     symbols: true,
+    //     uppercase: true,
+    //     lowercase: true,
+    //  });
 
        const salt = await bcrypt.genSalt(10);
        const hashedPassword = await bcrypt.hash(password, salt);
@@ -163,5 +163,3 @@ export async function changePassword(res,req){
   }
 }
 
-
-//a,YuF9cB  

@@ -16,9 +16,12 @@ export function initSocket(server) {
     console.log("✅ User connected:", socket.id);
 
     // Join a match room
+  
     socket.on("join_match", (matchId) => {
-      socket.join(matchId);
-      console.log(`User ${socket.id} joined match ${matchId}`);
+       const roomId = matchId.toString();
+      socket.join(roomId);
+      console.log(typeof(roomId));
+      console.log(`User ${socket.id} joined match ${roomId}`);
     });
 
     // Fetch live events for a match
@@ -29,7 +32,7 @@ export function initSocket(server) {
           "SELECT * FROM match_events WHERE match_id = ? ORDER BY created_at DESC",
           [matchId]
         );
-        console.log(rows)
+        // console.log(rows)
         socket.emit("live_events", rows);
       } catch (err) {
         console.error("Error fetching live events:", err);
@@ -38,13 +41,13 @@ export function initSocket(server) {
 
     // Send new event to a specific match room
     socket.on("send_live_event", async (eventData) => {
-      const { match_id, event_type, team_name, team_type} = eventData;
+      const { match_id, event_type, team_name, team_type, home_score, away_score } = eventData;
 
       try {
         // Insert into DB
         await db.query(
-          "INSERT INTO match_events (match_id, event_type, team_name,team_type) VALUES (?, ?, ?, ?)",
-          [match_id, event_type, team_name,team_type]
+          "INSERT INTO match_events (match_id, event_type, team_name,team_type,home_score,away_score) VALUES (?, ?, ?, ?, ?, ?)",
+          [match_id, event_type, team_name,team_type,home_score,away_score]
         );
 
         // Fetch latest event to send
@@ -67,3 +70,4 @@ export function initSocket(server) {
 }
 
 export { io };
+ 

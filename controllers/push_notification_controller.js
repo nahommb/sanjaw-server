@@ -2,7 +2,7 @@ import admin from "../helper/firebase.js";
 
 export async function pushNotification(req,res){
     const {title,body} = req.body;
-    
+    console.log(req.body);
     const message = {
     notification: { title, body },
     topic:'live_updates'
