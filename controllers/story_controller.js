@@ -34,10 +34,9 @@ export async function getStoryController(req,res){
 }
 export async function deleteStory(req,res){
   const {id} = req.params;
+  
   try{
 
-
-   
        const [rows] = await db.query("SELECT media_urls FROM stories WHERE id = ?", [id]);
    
        if (rows.length === 0) {
@@ -49,7 +48,7 @@ export async function deleteStory(req,res){
      
        for (let url of media) {
    
-         const parts = url.split("/");
+         const parts = url.split("/"); 
          const resourceType = parts[parts.indexOf("upload") - 1];  
        
          const fileName = parts[parts.length - 1]; 

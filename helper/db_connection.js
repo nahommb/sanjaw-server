@@ -69,7 +69,9 @@ async function initDB() {
   //     id INT AUTO_INCREMENT PRIMARY KEY,
   //     home_team VARCHAR(100) NOT NULL,
   //     away_team VARCHAR(100) NOT NULL,
-  //     live_id VARCHAR(100) NOT NULL
+  //     live_id VARCHAR(100) NOT NULL,
+  //     live_status VARCHAR(50) DEFAULT 'live',
+  //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   //   )
   //   `
   // ];

@@ -10,7 +10,7 @@ export async function createLiveMatchController (req,res){
     try {
       const[result] = await db.query("INSERT INTO matches (home_team,away_team,live_id) VALUES (?,?,?)",[home_team,away_team,live_id])
        
-       res.status(201).json({ message: "created", postId: result.insertId });
+       res.status(201).json({ message: "created", id: result.insertId });
     }
     catch (err) {
         console.error("Error in LivestreamController:", err);
@@ -22,9 +22,13 @@ export async function createLiveMatchController (req,res){
 export async function getLiveMatchController (req,res){
     console.log("getLiveMatchController called");
     try {
-       const [rows] = await db.query(
-         "SELECT * FROM matches",
-       );
+      const [rows] = await db.query(
+         "SELECT * FROM matches WHERE live_status = ? ORDER BY created_at DESC LIMIT 1",
+         ['live']
+      );
+      if(rows.length < 0){
+        return res.status(404).json({error:"No live match found"})
+      }
        res.status(200).json(rows);
     }
     catch (err) {
@@ -83,4 +87,20 @@ export async function editLiveScoreController(req,res){
     console.log(err)
     res.status(500).json({error:err}) 
   }
+}
+
+export async function endLiveMatchController(req,res){
+  const {id} = req.params;
+  console.log(id)
+  try{
+    await db.query(
+      "UPDATE matches SET live_status = ? WHERE id = ?",
+      ['finished', id]
+    );
+    res.json({success:true,message:"Match ended successfully"})
+  }
+  catch(err){
+    console.log(err)
+    res.status(500).json({error:err}) 
+  } 
 }

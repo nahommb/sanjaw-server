@@ -21,7 +21,7 @@ export async function createPost(req, res) {
       media: mediaUrls,
     });
   } catch (err) {
-    console.error("Error inserting post:", err);
+    console.error("Error inserting post:", err); 
     res.status(500).json({ error: "Database error" });
   }
 } 
@@ -133,9 +133,16 @@ export async function createMatchDay(req, res) {
 
 export async function getMatchDays(req, res) {
   console.log("Fetching match days");
+  const page = parseInt(req.query.page) || 1;
+  const limit = 10;
+  const offset = (page - 1) * limit;
+
+  console.log(`Page: ${page}, Limit: ${limit}, Offset: ${offset}`);
+  
   try {
     const [results] = await db.query(
-      "SELECT * FROM matchdays ORDER BY match_date ASC LIMIT 10"
+      "SELECT * FROM matchdays ORDER BY match_date DESC LIMIT ? OFFSET ?",
+      [limit, offset]
     );
     res.status(200).json(results);
   } catch (err) {

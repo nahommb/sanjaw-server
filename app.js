@@ -17,7 +17,7 @@ import { initSocket } from './helper/socket_server.js';
 
 app.use(cors(
   {
-    origin: '*',
+    origin: 'http://localhost:5173', // Adjust this to your frontend URL
     credentials: true, 
     methods: ['GET','POST','PUT','DELETE','PATCH'],
     allowedHeaders: ['Content-Type','Authorization']
